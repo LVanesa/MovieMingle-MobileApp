@@ -1,0 +1,18 @@
+# Java / Spring Boot
+Backend/target/
+Backend/.idea/
+Backend/.classpath
+Backend/.project
+Backend/.settings
+Backend/*.iml
+
+# Node / React Native
+Frontend/node_modules/
+Frontend/.expo/
+Frontend/.expo-shared/
+Frontend/.vscode/
+Frontend/dist/
+
+# OS
+.DS_Store
+Thumbs.db
