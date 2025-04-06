@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Lists - MovieMingle</title>
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <link rel="stylesheet" th:href="@{/css/homepage.css}"/>
+    <link rel="stylesheet" th:href="@{/css/recommendations.css}"/>
+</head>
+<body>
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script th:src="@{/js/recommendations.js}" defer></script>
+<header>
+    <nav class="navbar">
+        <!-- Logo -->
+        <a class="logo" href="/">MovieMingle</a>
+
+        <!-- Meniu de tip hamburger -->
+        <button class="menu-toggle">
+            <span class="menu-icon"></span>
+            <span class="menu-icon"></span>
+            <span class="menu-icon"></span>
+        </button>
+
+        <!-- Linkuri - se aplică securitatea individual pe fiecare element -->
+        <ul class="nav-links">
+            <!-- Link public -->
+            <li><a href="/homepage">Home</a></li>
+            <li><a href="/search">Search</a></li>
+
+            <!-- Linkuri pentru utilizatori autentificați -->
+            <li sec:authorize="isAuthenticated()"><a href="/recommendations">Recommended</a></li>
+            <li sec:authorize="isAuthenticated()"><a href="/mylists">My Movies</a></li>
+            <li sec:authorize="isAuthenticated()"><a href="/dashboard">My Dashboard</a> </li>
+            <li sec:authorize="isAuthenticated()">
+                <a href="/profile" class="profile-link">
+                    <img th:src="'/images/' + ${user.avatar}" alt="Profile" class="avatar-image" />
+                    <span class="profile-text">Profile</span>
+                </a>
+            </li>
+
+            <!-- Butoane pentru utilizatori neautentificați -->
+            <li sec:authorize="!isAuthenticated()">
+                <a href="/register" class="outline-button">Register</a>
+            </li>
+            <li sec:authorize="!isAuthenticated()">
+                <a href="/login" class="outline-button">Log In</a>
+            </li>
+
+        </ul>
+    </nav>
+</header>
+
+<main style="margin-top: 100px; padding: 10px;">
+    <!-- Watched Movies -->
+
+    <div id="watched-carousel" class="carousel-container">
+        <h2 class="carousel-title" style="text-align: left; margin-left: 20px;">Your Watched Movies</h2>
+
+        <div th:if="${watched.size() == 0}" style="text-align: center; margin-top: 20px; color: #e09f3e;">
+            <p>You haven't watched any movies yet! 🎥</p>
+            <p>Start watching your favorite movies and build your Watched list today!</p>
+        </div>
+
+        <div th:if="${watched.size() > 0}" class="swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide" th:each="movie : ${watched}">
+                    <div class="movie-card" th:data-movie-id="${movie?.tmdbId}" style="background: rgba(57, 0, 7, 0.6); border-radius: 8px; overflow: hidden; color: white; cursor: pointer;">
+                        <img th:if="${movie.posterLink != null}" th:src="${'https://image.tmdb.org/t/p/w500' + movie.posterLink}" th:alt="${movie.seriesTitle}" style="width: 100%; height: 300px; object-fit: cover;" />
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+
+    <!-- To Watch Movies -->
+    <div id="towatch-carousel" class="carousel-container">
+        <h2 class="carousel-title" style="text-align: left; margin-left: 20px;">Your Watchlist</h2>
+        <div th:if="${watchlist.size() == 0}" style="text-align: center; margin-top: 20px; color: #e09f3e;">
+            <p>Your Watchlist is empty! 📽️</p>
+            <p>Add movies you want to watch and never miss out on amazing stories!</p>
+        </div>
+
+        <div th:if="${watchlist.size() > 0}" class="swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide" th:each="movie : ${watchlist}">
+                    <div class="movie-card" th:data-movie-id="${movie?.tmdbId}" style="background: rgba(57, 0, 7, 0.6); border-radius: 8px; overflow: hidden; color: white; cursor: pointer;">
+                        <img th:if="${movie.posterLink != null}" th:src="${'https://image.tmdb.org/t/p/w500' + movie.posterLink}" th:alt="${movie.seriesTitle}" style="width: 100%; height: 300px; object-fit: cover;" />
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+
+    <!-- Favorite Movies -->
+    <div id="favourites-carousel" class="carousel-container">
+        <h2 class="carousel-title" style="text-align: left; margin-left: 20px;">Your Favourite Movies</h2>
+        <div th:if="${favourites.size() == 0}" style="text-align: center; margin-top: 20px; color: #e09f3e;">
+            <p>You don't have any favorite movies yet! ❤️</p>
+            <p>Mark movies you love as favorites and revisit them anytime!</p>
+        </div>
+
+        <div th:if="${favourites.size() > 0}" class="swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide" th:each="movie : ${favourites}">
+                    <div class="movie-card" th:data-movie-id="${movie?.tmdbId}" style="background: rgba(57, 0, 7, 0.6); border-radius: 8px; overflow: hidden; color: white; cursor: pointer;">
+                        <img th:if="${movie.posterLink != null}" th:src="${'https://image.tmdb.org/t/p/w500' + movie.posterLink}" th:alt="${movie.seriesTitle}" style="width: 100%; height: 300px; object-fit: cover;" />
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+
+    <!-- Rated Movies -->
+    <div id="rated-carousel" class="carousel-container">
+        <h2 class="carousel-title" style="text-align: left; margin-left: 20px;">Your Rated Movies</h2>
+        <div th:if="${rated.size() == 0}" style="text-align: center; margin-top: 20px; color: #e09f3e;">
+            <p>You haven't rated any movies yet! ⭐</p>
+            <p>Start rating movies to personalize your recommendations and help others discover great content!</p>
+        </div>
+
+        <div th:if="${rated.size() > 0}" class="swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide" th:each="movie : ${rated}">
+                    <div class="movie-card" th:data-movie-id="${movie?.tmdbId}" style="background: rgba(57, 0, 7, 0.6); border-radius: 8px; overflow: hidden; color: white; cursor: pointer;">
+                        <img th:if="${movie.posterLink != null}" th:src="${'https://image.tmdb.org/t/p/w500' + movie.posterLink}" th:alt="${movie.seriesTitle}" style="width: 100%; height: 300px; object-fit: cover;" />
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
