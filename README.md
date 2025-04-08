@@ -130,11 +130,17 @@ Testarea aplicației este esențială pentru a garanta:
 | Integrare RN   | Manuală               | Pre-configurată           |
 
 ---
-## Configuratie hardware (to do)
-
+## 🖥️ Configuratie hardware
+CPU: Intel Core Ultra 9 185H,  Intel Core i7-9750H
+GPU: NVIDIA GeForce RTX 4060, NVIDIA GeForce GTX 1650
+RAM: 32 GB, 8 GB
+Stocare: SSD 512GB, SSD 477 GB capacitate totală configurat RAID
 
 ---
-## Configuratie software (to do)
+## 🖥️ Configuratie software (to do)
+SO: Microsoft Windows 11 Pro, Microsoft Windows 11 Pro
+IDE: JetBrains IntelliJ IDEA 2024.3.1.1, Visual Studio Code
+Runtime Java: OpenJDK 21 (pentru Spring Boot)
 
 ---
 ## 🧪 Unit testing in aplicatie
