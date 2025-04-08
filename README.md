@@ -137,8 +137,7 @@ Testarea aplicației este esențială pentru a garanta:
 ## Configuratie software (to do)
 
 ---
-## Unit testing in aplicatie
-
+## 🧪 Unit testing in aplicatie
 Testele unitare sunt concepute pentru a verifica corectitudinea metodelor și funcțiilor individuale. În cadrul aplicației **MovieMingle**, am implementat **49 de teste unitare** care acoperă funcționalități esențiale precum: construirea matricei de recomandare, înregistrarea utilizatorului, gestionarea parolelor, marcarea filmelor ca favorite, administrarea ratingurilor și managementul token-urilor de securitate.
 Fiecare caz de test verifică rezultatele așteptate, iar **toate testele au fost trecute cu succes**. Mai jos se află un tabel sumar al principalelor cazuri de testare unitară:
 
@@ -194,7 +193,74 @@ Fiecare caz de test verifică rezultatele așteptate, iar **toate testele au fos
 | `testGetUserRatedMovies_NoRatings`                 | No rated movies scenario handled                 | Passed     |
 | `testGetUserRatedMovies_WithRatings`               | Rated movies retrieved correctly                 | Passed     |
 
+
+### JUnit si Mockito
+Pentru testarea aplicației MovieMingle, în backend-ul dezvoltat cu Java Spring Boot, sunt utilizate două framework-uri complementare: JUnit 5 și Mockito. Mai jos realizăm o comparație între cele două, cu accent pe utilitate, ușurința în folosire și exemple de cod reale extrase din proiect.
+
+#### 🎯 Scop, roluri și diferențe conceptuale
+JUnit este framework-ul de bază pentru a scrie și executa teste în Java, în timp ce Mockito este folosit pentru a crea obiecte simulative (mock-uri) ale dependențelor. Ele sunt frecvent folosite împreună pentru a acoperi toate tipurile de teste unitare și de integrare.
+
+| Framework | Utilitate principală                                           | Tip de testare                  |
+|-----------|----------------------------------------------------------------|----------------------------------|
+| JUnit     | Structurare, executare și organizare a testelor                | Testare unitară și de integrare |
+| Mockito   | Simulare de dependențe (mock-uri), control al comportamentului | Testare unitară (izolată)       |
+
+| Framework | Avantaje                                       | Limitări                                             |
+|-----------|------------------------------------------------|------------------------------------------------------|
+| JUnit     | Simplu de configurat, rulare directă în IDE    | Nu poate izola dependențe fără Mockito               |
+| Mockito   | Flexibil, permite testarea în izolare completă | Necesită cunoștințe suplimentare (mocking, stubbing) |
 ---
+📌 Exemplu 1 – Folosind doar JUnit
+```java
+@Test
+public void testAddNumbers() {
+    Calculator calc = new Calculator();
+    int result = calc.add(2, 3);
+    assertEquals(5, result);
+}
+
+```
+Aici testăm direct metoda add fără nicio dependență externă. 
+
+📌 Exemplu 2 – Folosind Mockito cu JUnit pentru simularea dependențelor
+```java
+@Mock
+private EmailService emailService;
+
+@InjectMocks
+private DefaultAppUserService userService;
+
+@Test
+public void testRegister_Success() throws Exception {
+    when(emailService.sendMail(any())).thenReturn(true);
+    userService.register(userDto);
+    verify(emailService, times(1)).sendMail(any());
+}
+```
+Aici EmailService este simulat pentru a nu trimite un email real, ci doar pentru a verifica dacă a fost apelat corect.
+
+
+---
+🔍 Analiză și concluzie detaliată
+
+- JUnit permite testarea metodelor individuale, asigurând că logica este corectă atunci când nu există dependențe externe.
+
+- Mockito intervine atunci când clasa pe care o testăm interacționează cu alte clase sau servicii – în loc să apelăm efectiv un repository sau un serviciu de email, simulăm comportamentul lor.
+
+- JUnit și Mockito funcționează cel mai bine împreună, oferind:
+
+- Testare izolată, fără efecte secundare sau acces la baze de date reale
+
+- Control total asupra comportamentului mock-urilor
+
+- Verificări precise privind ce metode au fost apelate și cum
+---
+📌 Utilitate în MovieMingle:
+
+- JUnit este folosit pentru testarea funcțiilor interne de prelucrare a datelor (ex: criptare parole, validare tokenuri).
+
+- Mockito este folosit pentru a simula componente externe precum EmailService, SecureTokenService sau AppUserRepository, astfel încât testele să fie rapide, izolate și fiabile.
+
 ---
 ## 📚 Resurse și Surse de Inspirație
 - Bitrise Blog – [“React Native E2E UI testing with Detox and Bitrise”](https://www.bitrise.io/blog/react-native-e2e-ui-testing-with-detox-and-bitrise)
