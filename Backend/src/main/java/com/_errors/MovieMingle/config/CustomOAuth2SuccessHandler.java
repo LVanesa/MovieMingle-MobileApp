@@ -1,4 +1,4 @@
-package com._errors.MovieMingle.security;
+package com._errors.MovieMingle.config;
 
 import com._errors.MovieMingle.service.user.AppUserService;
 import jakarta.servlet.ServletException;

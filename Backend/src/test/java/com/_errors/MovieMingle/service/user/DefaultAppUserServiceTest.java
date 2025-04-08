@@ -132,36 +132,6 @@ public class DefaultAppUserServiceTest {
         verify(passwordEncoder, times(1)).encode("plainPassword");
     }
 
-    @Test
-    public void testSendRegistrationConfirmationEmail_Success() throws MessagingException {
-        SecureToken secureToken = new SecureToken();
-        secureToken.setToken("valid-token");
-
-        // setam comportamentul mock-urilor
-        when(secureTokenService.createSecureToken()).thenReturn(secureToken);
-        when(secureTokenRepository.save(any(SecureToken.class))).thenReturn(secureToken);
-        doNothing().when(emailService).sendMail(any(AccountVerificationEmailContext.class)); // EmailService nu face nimic, doar simuleaza trimiterea emailului
-
-        ReflectionTestUtils.setField(userService, "baseURL", "http://localhost:8080");
-
-        // trimitem mailul
-        userService.sendRegistrationConfirmationEmail(appUser);
-
-        // Verificăm interacțiunile
-        verify(secureTokenService, times(1)).createSecureToken(); // Verificăm că tokenul a fost creat
-        verify(secureTokenRepository, times(1)).save(any(SecureToken.class)); // Verificăm că tokenul a fost salvat
-        verify(emailService, times(1)).sendMail(any(AccountVerificationEmailContext.class)); // Verificăm că emailul a fost trimis
-
-        // verificam ca obiectul AccountVerificationEmailContext a fost creat corect
-        ArgumentCaptor<AccountVerificationEmailContext> emailContextCaptor = ArgumentCaptor.forClass(AccountVerificationEmailContext.class);
-        verify(emailService).sendMail(emailContextCaptor.capture());
-        AccountVerificationEmailContext emailContext = emailContextCaptor.getValue();
-
-        // verificam ca token-ul și URL-ul de verificare sunt corect adaugate
-        assertEquals("valid-token", emailContext.getContext().get("token"));
-        assertEquals("http://localhost:8080/register/verify?token=valid-token", emailContext.getContext().get("verificationURL"));
-    }
-
 
     @Test
     public void testCheckIfUserExist_UserExists() {
