@@ -63,7 +63,7 @@ public class DefaultAppUserService implements AppUserService {
         userEntity.setCreatedAt(new Date());
         encodePassword(user, userEntity);
         userEntity.setAvatar("general_avatar.png");
-        //userEntity.setSecret(mfaTokenManager.generateSecretKey());
+        userEntity.setAccountVerified(Boolean.TRUE);
         userRepository.save(userEntity);
         sendRegistrationConfirmationEmail(userEntity);
     }

@@ -25,7 +25,7 @@ public class MovieApiClient {
     @Value("${tmdb.api.key}")
     private String apiKey; // Injectăm cheia API din application.properties
 
-    @Value("${tmdb.bearer.token")
+    @Value("${tmdb.bearer.token}")
     private String bearerToken;
 
     private final String API_BASE_URL = "https://api.themoviedb.org/3"; // URL-ul de bază pentru TMDB

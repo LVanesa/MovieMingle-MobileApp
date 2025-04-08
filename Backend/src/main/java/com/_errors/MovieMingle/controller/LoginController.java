@@ -1,92 +1,124 @@
 package com._errors.MovieMingle.controller;
-
-import com._errors.MovieMingle.dto.ResetPasswordDto;
+import com._errors.MovieMingle.dto.OAuthDto;
 import com._errors.MovieMingle.model.AppUser;
-import com._errors.MovieMingle.service.user.AppUserService;
-import jakarta.servlet.http.HttpSession;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import com._errors.MovieMingle.service.user.DefaultAppUserService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import com._errors.MovieMingle.security.JwtTokenProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/login")
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/auth")
 public class LoginController {
-    public static final String LAST_USERNAME_KEY = "LAST_USERNAME";
 
-    private final AppUserService appUserService;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
-    public LoginController(AppUserService appUserService) {
-        this.appUserService = appUserService;
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private DefaultAppUserService userService;
+
+    // DTO pentru request de login
+    public static class LoginRequest {
+        @NotBlank(message = "Email is required")
+        @Email(message = "Enter a valid email")
+        private String email;
+
+        @NotBlank(message = "Password is required")
+        private String password;
+
+        // Getters & Setters
+        public String getEmail() {
+            return email;
+        }
+        public void setEmail(String email) {
+            this.email = email;
+        }
+        public String getPassword() {
+            return password;
+        }
+        public void setPassword(String password) {
+            this.password = password;
+        }
     }
 
-    @GetMapping
-    public String login(@RequestParam(value = "error", defaultValue = "false") boolean loginError,
-                        @RequestParam(value = "invalid-session", defaultValue = "false") boolean invalidSession,
-                        final Model model, HttpSession session) {
+    // DTO pentru response cu tokenul JWT
+    public static class TokenResponse {
+        private String token;
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-
-        if (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
-            if (authentication.getPrincipal() instanceof OAuth2User oAuth2User) {
-                handleOAuth2User(oAuth2User);
-            }// Redirecționează utilizatorul autentificat la pagina principală
-            return "redirect:/homepage";
+        public TokenResponse(String token) {
+            this.token = token;
         }
 
-        String userName = getUserName(session);
-
-        // Adaugă "forgotPassword" în model, indiferent de condiții
-        model.addAttribute("forgotPassword", new ResetPasswordDto());
-
-        if (loginError) {
-            if (StringUtils.isNotEmpty(userName)) {
-                model.addAttribute("accountLocked", Boolean.TRUE);
-                return "login";
-            }
+        public String getToken() {
+            return token;
         }
-
-        if (invalidSession) {
-            model.addAttribute("invalidSession", "You already have an active session. We do not allow multiple active sessions");
+        public void setToken(String token) {
+            this.token = token;
         }
-
-        model.addAttribute("accountLocked", Boolean.FALSE);
-        return "login";
     }
 
-    final String getUserName(HttpSession session) {
-        final String username = (String) session.getAttribute(LAST_USERNAME_KEY);
-        if (StringUtils.isNotEmpty(username)) {
-            session.removeAttribute(LAST_USERNAME_KEY); // Elimină username-ul din sesiune
-        }
-        return username;
-    }
+    // POST /api/auth/login
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request, BindingResult result) {
+        Map<String, String> errors = new HashMap<>();
 
-    private void handleOAuth2User(OAuth2User oAuth2User) {
-        String email = oAuth2User.getAttribute("email");
-        String fullName = oAuth2User.getAttribute("name");
-
-        // Extrage prenumele și numele de familie
-        String firstName = "";
-        String lastName = "";
-
-        if (fullName != null && fullName.contains(" ")) {
-            String[] nameParts = fullName.split(" ", 2); // Împarte la primul spațiu
-            firstName = nameParts[0];
-            lastName = nameParts[1];
-        } else {
-            firstName = fullName; // Dacă nu există spațiu, tot numele este considerat "firstName"
+        if (result.hasErrors()) {
+            result.getFieldErrors().forEach(err ->
+                    errors.put(err.getField(), err.getDefaultMessage()));
+            return ResponseEntity.badRequest().body(errors);
         }
 
-        // Procesează utilizatorul
-        appUserService.processOAuth2User(email, firstName, lastName, "google");
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+
+            String token = jwtTokenProvider.generateToken(authentication);
+            return ResponseEntity.ok(new TokenResponse(token));
+
+        } catch (BadCredentialsException ex) {
+            errors.put("general", "Invalid email or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errors);
+        } catch (AuthenticationException ex) {
+            errors.put("general", "Authentication failed");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errors);
+        }
     }
+
+    @PostMapping("/oauth2/google")
+    public ResponseEntity<?> oauthLogin(@RequestBody OAuthDto user) {
+        AppUser appUser = userService.processOAuth2User(
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName(),
+                "google"
+        );
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                appUser.getEmail(), null, AuthorityUtils.createAuthorityList(appUser.getRole())
+        );
+
+        String token = jwtTokenProvider.generateToken(authentication);
+
+        return ResponseEntity.ok(new TokenResponse(token));
+    }
+
 
 }

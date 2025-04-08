@@ -1,112 +1,97 @@
 package com._errors.MovieMingle.controller;
 
+import com._errors.MovieMingle.dto.RegisterDto;
 import com._errors.MovieMingle.exception.InvalidTokenException;
 import com._errors.MovieMingle.exception.UserAlreadyExistsException;
-import com._errors.MovieMingle.model.AppUser;
-import com._errors.MovieMingle.dto.RegisterDto;
 import com._errors.MovieMingle.repository.AppUserRepository;
 import com._errors.MovieMingle.service.user.DefaultAppUserService;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.thymeleaf.util.StringUtils;
 
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
-@Controller
-@RequestMapping("/register")
+@RestController
+@RequestMapping("/api/auth")
 public class RegistrationController {
 
-    private static final String REDIRECT_LOGIN= "redirect:/login";
-
-    @Resource
-    private MessageSource messageSource;
+    @Autowired
+    private DefaultAppUserService userService;
 
     @Autowired
     private AppUserRepository userRepository;
 
     @Autowired
-    private DefaultAppUserService userService;
+    private MessageSource messageSource;
 
-    @GetMapping
-    public String register(Model model){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
-            // Redirecționează utilizatorul autentificat la pagina principală
-            return "redirect:/homepage";
-        }
-        RegisterDto registerDto = new RegisterDto();
-        model.addAttribute(registerDto);
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterDto registerDto,
+                                      BindingResult result) {
+        Locale locale = LocaleContextHolder.getLocale();
 
-        model.addAttribute("succes", false);
-        return "register";
-    }
+        Map<String, String> errors = new HashMap<>();
 
-    @PostMapping
-    public String register(
-            Model model,
-            @Valid @ModelAttribute RegisterDto registerDto,
-            BindingResult result,
-            RedirectAttributes redirectAttributes
-    ){
+        if (result.hasErrors()) {
+            result.getFieldErrors().forEach(fieldError -> {
+                String field = fieldError.getField();
+                // Remap `passwordConfirmed` to `confirmPassword`
+                if ("passwordConfirmed".equals(field)) {
+                    field = "confirmPassword";
+                }
+                errors.put(field, fieldError.getDefaultMessage());
+            });
 
-        if (!registerDto.getPassword().equals(registerDto.getConfirmPassword())){
-            result.addError(
-                    new FieldError("registerDto", "confirmPassword",
-                            "Password and Confirm Password do not match!")
-            );
+            return ResponseEntity.badRequest().body(errors);
         }
 
-        AppUser appUser = userRepository.findByEmail(registerDto.getEmail());
-        if(appUser != null){
-            result.addError(
-                    new FieldError("registerDto","email",
-                            "E-mail address is already used!")
-            );
-        }
-
-        if (result.hasErrors()){
-            return "register";
+        if (userRepository.findByEmail(registerDto.getEmail()) != null) {
+            errors.put("email", messageSource.getMessage("user.already.logged.in", null, locale));
+            return ResponseEntity.badRequest().body(errors);
         }
 
         try {
-
             userService.register(registerDto);
-
-        } catch (UserAlreadyExistsException e ) {
-            result.rejectValue("email", "userData.email","An account already exists for this email.");
-            model.addAttribute("registrationForm", registerDto);
-            return "register";
+            return ResponseEntity.ok(
+                    messageSource.getMessage("user.registration.verification.email.msg", null, locale)
+            );
+        } catch (UserAlreadyExistsException e) {
+            errors.put("email", messageSource.getMessage("user.already.logged.in", null, locale));
+            return ResponseEntity.badRequest().body(errors);
+        } catch (Exception e) {
+            errors.put("general", "An unexpected error occurred.");
+            return ResponseEntity.internalServerError().body(errors);
         }
-        model.addAttribute("registrationMsg", messageSource.getMessage("user.registration.verification.email.msg", null, LocaleContextHolder.getLocale()));
-        return "register";
     }
+
 
     @GetMapping("/verify")
-    public String verifyUser(@RequestParam(required = false) String token, final Model model, RedirectAttributes redirAttr){
+    public ResponseEntity<?> verifyUser(@RequestParam(required = false) String token) {
+        Locale locale = LocaleContextHolder.getLocale();
+        Map<String, String> errors = new HashMap<>();
 
-        if(StringUtils.isEmpty(token)){
-            redirAttr.addFlashAttribute("tokenError", messageSource.getMessage("user.registration.verification.missing.token", null, LocaleContextHolder.getLocale()));
-            return REDIRECT_LOGIN;
+        if (StringUtils.isEmpty(token)) {
+            errors.put("general", messageSource.getMessage("user.registration.verification.missing.token", null, locale));
+            return ResponseEntity.badRequest().body(errors);
         }
+
         try {
             userService.verifyUser(token);
+            return ResponseEntity.ok(
+                    messageSource.getMessage("user.registration.verification.success", null, locale)
+            );
         } catch (InvalidTokenException e) {
-            redirAttr.addFlashAttribute("tokenError", messageSource.getMessage("user.registration.verification.invalid.token", null,LocaleContextHolder.getLocale()));
-            return REDIRECT_LOGIN;
+            errors.put("general", messageSource.getMessage("user.registration.verification.invalid.token", null, locale));
+            return ResponseEntity.badRequest().body(errors);
         }
-
-        redirAttr.addFlashAttribute("verifiedAccountMsg", messageSource.getMessage("user.registration.verification.success", null,LocaleContextHolder.getLocale()));
-        return REDIRECT_LOGIN;
     }
+
+
 }

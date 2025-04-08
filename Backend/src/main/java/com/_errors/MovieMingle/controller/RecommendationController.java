@@ -8,17 +8,19 @@ import com._errors.MovieMingle.repository.AppUserRepository;
 import com._errors.MovieMingle.service.MovieApiClient;
 import com._errors.MovieMingle.service.user.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Controller
+@RestController
+@RequestMapping("/api")
 public class RecommendationController {
 
     @Autowired
@@ -31,35 +33,25 @@ public class RecommendationController {
     private MovieApiClient movieApiClient;
 
     @GetMapping("/recommendations")
-    public String showRecommendations(Model model, Principal principal) {
-        AppUser user;
+    public ResponseEntity<List<Movie>> getUserRecommendations(@RequestParam int userId) {
+        AppUser user = userRepository.findById(userId).orElse(null);
         List<Movie> recommendations = new ArrayList<>();
 
-        if (principal != null) {
-            user = userService.findByEmail(principal.getName());
-            System.out.println("User found: " + user.getId());
-
-            if (user.getAvatar() == null) {
-                user.setAvatar("general_avatar.png");
-            }
-
-            try {
-
-                recommendations = svdRecommendationService.recommendMovies((long) user.getId(), 10);
-
-            } catch (Exception e) {
-                System.out.println("Error getting recommendations: " + e.getMessage());
-                e.printStackTrace();
-            }
-        } else {
-            user = new AppUser();
-            user.setAvatar("general_avatar.png");
+        if (user == null) {
+            return ResponseEntity.notFound().build();
         }
 
-        model.addAttribute("user", user);
-        model.addAttribute("recommendedMovies", recommendations);
-        return "recommendations";
+        try {
+            recommendations = svdRecommendationService.recommendMovies((long) user.getId(), 10);
+        } catch (Exception e) {
+            System.err.println("Error getting recommendations for user ID: " + userId);
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
+
+        return ResponseEntity.ok(recommendations);
     }
+
 
     @GetMapping("/surprise")
     @ResponseBody

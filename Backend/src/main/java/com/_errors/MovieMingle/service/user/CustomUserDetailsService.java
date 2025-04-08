@@ -13,16 +13,14 @@ import org.springframework.stereotype.Service;
 public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private AppUserRepository repository;
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        final AppUser appUser =  repository.findByEmail(email);
-        if(appUser==null){
-            throw new UsernameNotFoundException(email);
+        AppUser appUser = repository.findByEmail(email);
+        if (appUser == null) {
+            throw new UsernameNotFoundException("User not found: " + email);
         }
-        boolean enabled = !appUser.isAccountVerified();
-        return User.withUsername(appUser.getEmail())
-                .password(appUser.getPassword())
-                .disabled(enabled)
-                .authorities("USER").build();
+        return appUser; // <- direct instanța ta, care implementează UserDetails
     }
+
 }

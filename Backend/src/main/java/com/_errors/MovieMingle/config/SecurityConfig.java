@@ -1,5 +1,6 @@
 package com._errors.MovieMingle.config;
 
+import com._errors.MovieMingle.security.JwtAuthenticationFilter;
 import com._errors.MovieMingle.service.user.AppUserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,8 +21,11 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 
 import com._errors.MovieMingle.security.CustomOAuth2SuccessHandler;
 import java.io.IOException;
@@ -37,49 +42,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter) throws Exception {
         return http
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers(
-                                "/profile/update-avatar", "/api/movies/watched/add", "/api/movies/watched/remove",
-                                "/api/movies/watched/check", "/api/movies/ratings/**", "/api/movies/favourites/**",
-                                "/api/movies/watchlist/**"))
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/homepage", "/register", "/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers("/search").permitAll()
-                        .requestMatchers("/forgotPassword").permitAll()
-                        .requestMatchers("/password").permitAll()
-                        .requestMatchers("/password/**").permitAll()
-                        .requestMatchers("/password/request").permitAll()
-                        .requestMatchers("/password/change").permitAll()
-                        .requestMatchers("/movie-details**").permitAll()
-                        .requestMatchers("/mylists").permitAll()
-                        .requestMatchers("/movie-details/**").permitAll()
-                        .requestMatchers("/login").permitAll()
-                        .requestMatchers("/register/verify").permitAll()
-                        .requestMatchers("/logout").permitAll()
-                        .requestMatchers("/recommendations").permitAll()
-                        .requestMatchers("/quiz").permitAll()
-                        .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll() // Permite accesul la rutele OAuth2
-                        .requestMatchers("/profile").authenticated()
-                        .requestMatchers("/profile/update-avatar").authenticated()
-                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/register/**", "/login/**", "/verify/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/", true)
-                        .failureUrl("/login?error=true")
-                )
-                .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/login") // Folosește aceeași pagină de login pentru OAuth2
-                        .defaultSuccessUrl("/", true)
-                        .failureUrl("/login?error=true")
-                        .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService()))
-                        .successHandler(customOAuth2SuccessHandler) // Adaugă handler-ul de succes personalizat
-                )
-
-                .logout(config -> config.logoutSuccessUrl("/"))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -117,4 +88,9 @@ public class SecurityConfig {
             );
         };
     }
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
 }
