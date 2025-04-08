@@ -137,7 +137,64 @@ Testarea aplicației este esențială pentru a garanta:
 ## Configuratie software (to do)
 
 ---
-## Unit testing in aplicatie (to do)
+## Unit testing in aplicatie
+
+Testele unitare sunt concepute pentru a verifica corectitudinea metodelor și funcțiilor individuale. În cadrul aplicației **MovieMingle**, am implementat **49 de teste unitare** care acoperă funcționalități esențiale precum: construirea matricei de recomandare, înregistrarea utilizatorului, gestionarea parolelor, marcarea filmelor ca favorite, administrarea ratingurilor și managementul token-urilor de securitate.
+Fiecare caz de test verifică rezultatele așteptate, iar **toate testele au fost trecute cu succes**. Mai jos se află un tabel sumar al principalelor cazuri de testare unitară:
+
+| **Test Case**                                      | **Expected Result**                              | **Status** |
+|----------------------------------------------------|--------------------------------------------------|------------|
+| `testBuildMatrix`                                  | Matrix built successfully                        | Passed     |
+| `testRatingMatrix`                                 | Rating matrix correctly computed                 | Passed     |
+| `testTrainModel`                                   | Model trained successfully                       | Passed     |
+| `testRecommendMovies`                              | Movies recommended accurately                    | Passed     |
+| `testUpdateRating`                                 | Rating updated correctly                         | Passed     |
+| `testForgottenPassword_Success`                    | Reset password email sent                        | Passed     |
+| `testForgottenPassword_UserNotFound`               | User not found error handled                     | Passed     |
+| `testUpdatePassword_Success`                       | Password updated successfully                    | Passed     |
+| `testUpdatePassword_InvalidToken`                  | Invalid token error handled                      | Passed     |
+| `testUpdatePassword_ExpiredToken`                  | Expired token error handled                      | Passed     |
+| `testUpdatePassword_UserNotFound`                  | User not found error handled                     | Passed     |
+| `testSendResetPasswordEmail_Success`               | Reset password email sent                        | Passed     |
+| `testRegister_UserAlreadyExists`                   | Duplicate user error handled                     | Passed     |
+| `testRegister_Success`                             | User registered successfully                     | Passed     |
+| `testEncodePassword`                               | Password encoded correctly                       | Passed     |
+| `testCheckIfUserExist_UserExists`                  | User exists validation passed                    | Passed     |
+| `testCheckIfUserExist_UserDoesNotExist`            | No user found as expected                        | Passed     |
+| `testAddMovieToFavourites_UserNotFound`            | User not found error handled                     | Passed     |
+| `testAddMovieToFavourites_MovieAlreadyInFavourites`  | Duplicate movie error handled                    | Passed     |
+| `testAddMovieToFavourites_NewMovie`                | New movie added to favourites                    | Passed     |
+| `testIsMovieFavourite_MovieNotInFavourites`        | Movie not in favourites verified                 | Passed     |
+| `testIsMovieFavourite_MovieInFavourites`           | Movie in favourites confirmed                    | Passed     |
+| `testRemoveFromFavourites_UserNotFound`            | User not found error handled                     | Passed     |
+| `testRemoveFromFavourites_MovieNotFound`           | Movie not found error handled                    | Passed     |
+| `testRemoveFromFavourites_MovieNotInFavourites`    | Movie not in favourites handled                  | Passed     |
+| `testRemoveFromFavourites_Success`                 | Movie removed successfully                       | Passed     |
+| `testGetUserFavouriteMovies`                       | Favourite movies retrieved                       | Passed     |
+| `testGetUserDashboardStats`                        | Dashboard stats computed correctly               | Passed     |
+| `testGetUserDashboardStats_NoData`                 | No data scenario handled correctly               | Passed     |
+| `testCreateSecureToken`                            | Secure token created                             | Passed     |
+| `testSaveSecureToken`                              | Secure token saved                               | Passed     |
+| `testFindByToken`                                  | Token found successfully                         | Passed     |
+| `testFindByToken_NotFound`                         | Token not found handled                          | Passed     |
+| `testRemoveToken`                                  | Token removed successfully                       | Passed     |
+| `testRemoveTokenByToken`                           | Token removed by identifier                      | Passed     |
+| `testGetTokenValidityInSeconds`                    | Token validity computed correctly                | Passed     |
+| `testAddRating_UserNotFound`                       | User not found error handled                     | Passed     |
+| `testAddRating_NewMovie`                           | Rating added for a new movie                     | Passed     |
+| `testAddRating_ExistingMovie`                      | Existing movie rating updated                    | Passed     |
+| `testRemoveRating_UserNotFound`                    | User not found error handled                     | Passed     |
+| `testRemoveRating_MovieNotFound`                   | Movie not found error handled                    | Passed     |
+| `testRemoveRating_RatingNotFound`                  | Rating not found error handled                   | Passed     |
+| `testRemoveRating_Success`                         | Rating removed successfully                      | Passed     |
+| `testGetAverageRating_NoRatings`                   | No ratings scenario handled                      | Passed     |
+| `testGetAverageRating_WithRatings`                 | Average rating computed accurately               | Passed     |
+| `testGetUserRating_RatingNotFound`                 | Rating not found error handled                   | Passed     |
+| `testGetUserRating_Success`                        | User rating retrieved successfully               | Passed     |
+| `testGetUserRatedMovies_NoRatings`                 | No rated movies scenario handled                 | Passed     |
+| `testGetUserRatedMovies_WithRatings`               | Rated movies retrieved correctly                 | Passed     |
+
+---
 ---
 ## 📚 Resurse și Surse de Inspirație
 - Bitrise Blog – [“React Native E2E UI testing with Detox and Bitrise”](https://www.bitrise.io/blog/react-native-e2e-ui-testing-with-detox-and-bitrise)
