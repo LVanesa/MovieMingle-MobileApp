@@ -137,7 +137,7 @@ Testarea aplicației este esențială pentru a garanta:
 - Stocare: SSD 512GB, SSD 477 GB capacitate totală configurat RAID
 
 ---
-## 🖥️ Configuratie software (to do)
+## 🖥️ Configuratie software
 - SO: Microsoft Windows 11 Pro, Microsoft Windows 11 Pro
 - IDE: JetBrains IntelliJ IDEA 2024.3.1.1, Visual Studio Code
 - Runtime Java: OpenJDK 21 (pentru Spring Boot)
