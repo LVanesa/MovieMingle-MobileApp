@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,12 +12,12 @@ import {
   Modal,
 } from "react-native";
 import { BarChart, LineChart, PieChart } from "react-native-chart-kit";
+import Toast from "react-native-toast-message";
 import {
   fetchDashboardData,
   fetchUserProfile,
   updateUserAvatar,
 } from "../../api/movieApi";
-import Toast from "react-native-toast-message";
 
 const screenWidth = Dimensions.get("window").width - 40;
 
@@ -45,13 +45,21 @@ const chartColors = [
   "#e67e22",
 ];
 
+const chartConfig = {
+  backgroundColor: "#000",
+  backgroundGradientFrom: "#000",
+  backgroundGradientTo: "#000",
+  decimalPlaces: 1,
+  color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+  labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+};
+
 const ProfileScreen = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [user, setUser] = useState(null);
   const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [pageLoading, setPageLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [avatarModalVisible, setAvatarModalVisible] = useState(false);
 
   const loadEverything = useCallback(async () => {
@@ -63,9 +71,9 @@ const ProfileScreen = () => {
       ]);
       setDashboardData(dashboard);
       setUser(profile);
-      setSelectedAvatar(profile.avatar); // Fara /images/
+      setSelectedAvatar(profile.avatar);
     } catch (e) {
-      console.error("Error loading profile/dashboard:", e);
+      console.error("Error loading data:", e);
     } finally {
       setRefreshing(false);
       setPageLoading(false);
@@ -81,7 +89,6 @@ const ProfileScreen = () => {
       await updateUserAvatar(`/images/${avatarFileName}`);
       setSelectedAvatar(avatarFileName);
       setAvatarModalVisible(false);
-      await loadEverything();
       Toast.show({
         type: "success",
         text1: "Avatar Updated!",
@@ -92,7 +99,7 @@ const ProfileScreen = () => {
       Toast.show({
         type: "error",
         text1: "Update Failed",
-        text2: "Could not change your avatar. Please try again 🙏",
+        text2: "Could not change avatar. Try again 🙏",
       });
     }
   };
@@ -105,24 +112,27 @@ const ProfileScreen = () => {
     );
   }
 
-  const chartConfig = {
-    backgroundColor: "#000",
-    backgroundGradientFrom: "#000",
-    backgroundGradientTo: "#000",
-    decimalPlaces: 1,
-    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-  };
+  const safeDashboardData = dashboardData || {};
+  const safeMoviesPerMonth = safeDashboardData.moviesPerMonth || {};
+  const safeGenresWatched = safeDashboardData.genresWatched || {};
 
-  const genreData = dashboardData
-    ? Object.keys(dashboardData.genresWatched).map((genre, index) => ({
+  const genreData = Object.keys(safeGenresWatched).length
+    ? Object.keys(safeGenresWatched).map((genre, index) => ({
         name: genre,
-        population: dashboardData.genresWatched[genre],
+        population: safeGenresWatched[genre],
         color: chartColors[index % chartColors.length],
         legendFontColor: "#fff",
         legendFontSize: 12,
       }))
-    : [];
+    : [
+        {
+          name: "No Data",
+          population: 1,
+          color: "#555",
+          legendFontColor: "#fff",
+          legendFontSize: 12,
+        },
+      ];
 
   return (
     <ScrollView
@@ -135,6 +145,7 @@ const ProfileScreen = () => {
         />
       }
     >
+      {/* Avatar Section */}
       <View style={styles.profileSection}>
         <Image
           source={
@@ -151,20 +162,12 @@ const ProfileScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* MODAL pentru selectare avatar */}
-      <Modal
-        visible={avatarModalVisible}
-        animationType="slide"
-        transparent={true}
-      >
+      {/* Modal Avatar Selection */}
+      <Modal visible={avatarModalVisible} animationType="slide" transparent>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.subHeader}>Choose Your Avatar</Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.avatarScroll}
-            >
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {Object.keys(avatarImages).map((file) => (
                 <TouchableOpacity
                   key={file}
@@ -190,20 +193,20 @@ const ProfileScreen = () => {
         </View>
       </Modal>
 
-      {/* Restul de profil */}
-
+      {/* User Info */}
       <View style={styles.infoSection}>
         <Text style={styles.infoLabel}>First Name:</Text>
-        <Text style={styles.infoValue}>{user.firstName}</Text>
+        <Text style={styles.infoValue}>{user?.firstName ?? "-"}</Text>
         <Text style={styles.infoLabel}>Last Name:</Text>
-        <Text style={styles.infoValue}>{user.lastName}</Text>
+        <Text style={styles.infoValue}>{user?.lastName ?? "-"}</Text>
         <Text style={styles.infoLabel}>Email:</Text>
-        <Text style={styles.infoValue}>{user.email}</Text>
+        <Text style={styles.infoValue}>{user?.email ?? "-"}</Text>
       </View>
 
-      {/* Dashboard charts */}
+      {/* Dashboard */}
       <Text style={styles.header}>Dashboard 📊</Text>
 
+      {/* User Stats */}
       <Text style={styles.chartTitle}>User Stats 📈</Text>
       <BarChart
         data={{
@@ -211,9 +214,9 @@ const ProfileScreen = () => {
           datasets: [
             {
               data: [
-                dashboardData.totalMoviesWatched,
-                dashboardData.totalHoursWatched,
-                dashboardData.averageRating,
+                safeDashboardData.totalMoviesWatched ?? 0,
+                safeDashboardData.totalHoursWatched ?? 0,
+                safeDashboardData.averageRating ?? 0,
               ],
             },
           ],
@@ -224,11 +227,20 @@ const ProfileScreen = () => {
         style={styles.chart}
       />
 
+      {/* Monthly Activity */}
       <Text style={styles.chartTitle}>Monthly Activity 📅</Text>
       <LineChart
         data={{
-          labels: Object.keys(dashboardData.moviesPerMonth),
-          datasets: [{ data: Object.values(dashboardData.moviesPerMonth) }],
+          labels: Object.keys(safeMoviesPerMonth).length
+            ? Object.keys(safeMoviesPerMonth)
+            : ["No Data"],
+          datasets: [
+            {
+              data: Object.values(safeMoviesPerMonth).length
+                ? Object.values(safeMoviesPerMonth)
+                : [0],
+            },
+          ],
         }}
         width={screenWidth}
         height={220}
@@ -237,6 +249,7 @@ const ProfileScreen = () => {
         style={styles.chart}
       />
 
+      {/* Genre Distribution */}
       <Text style={styles.chartTitle}>Genre Distribution 🎭</Text>
       <PieChart
         data={genreData}
@@ -255,7 +268,6 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#000", padding: 20 },
   header: {
-    marginTop: 30,
     fontSize: 24,
     color: "#fff",
     fontWeight: "700",
@@ -266,8 +278,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#fff",
     fontWeight: "600",
-    marginBottom: 10,
-    marginTop: 20,
+    marginVertical: 10,
   },
   chartTitle: {
     fontSize: 18,
