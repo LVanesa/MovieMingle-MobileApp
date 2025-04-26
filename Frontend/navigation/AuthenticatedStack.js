@@ -15,7 +15,7 @@ const AuthenticatedStack = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        headerShown: true, // 👈 activează header-ul
+        headerShown: true,
         headerStyle: {
           backgroundColor: "#000",
         },
@@ -23,7 +23,7 @@ const AuthenticatedStack = () => {
           color: "#fff",
         },
         headerTintColor: "#fff",
-        headerRight: () => <LogoutButton />, // 👈 adaugă butonul
+        headerRight: () => <LogoutButton />,
 
         tabBarActiveTintColor: "#ffffff",
         tabBarInactiveTintColor: "#aaa",
@@ -43,7 +43,7 @@ const AuthenticatedStack = () => {
             case "Search":
               iconName = "search-outline";
               break;
-            case "Profile":
+            case "Your Profile":
               iconName = "person-outline";
               break;
             case "MovieList":
@@ -72,7 +72,7 @@ const AuthenticatedStack = () => {
         options={{ headerShown: false }}
         component={MovieListStackNavigator}
       />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Your Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 };

@@ -1,5 +1,6 @@
 package com._errors.MovieMingle.controller;
 
+import com._errors.MovieMingle.dto.UserProfileDto;
 import com._errors.MovieMingle.model.AppUser;
 import com._errors.MovieMingle.repository.AppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-@Controller
+@RestController
+@RequestMapping("/api/profile")
 public class ProfileController {
 
     private final AppUserRepository appUserRepository;
@@ -21,25 +23,28 @@ public class ProfileController {
         this.appUserRepository = appUserRepository;
     }
 
-    @GetMapping("/profile")
-    public String getProfilePage(Model model) {
+    @GetMapping
+    public UserProfileDto getProfileData() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
-
         AppUser currentUser = appUserRepository.findByEmail(userEmail);
-        if (currentUser != null) {
-            model.addAttribute("user", currentUser);
+
+        if (currentUser == null) {
+            throw new RuntimeException("User not found");
         }
 
-        return "profile";
+        return new UserProfileDto(
+                currentUser.getFirstName(),
+                currentUser.getLastName(),
+                currentUser.getEmail(),
+                currentUser.getAvatar()
+        );
     }
 
-    @PostMapping("/profile/update-avatar")
-    @ResponseBody
+    @PostMapping("/update-avatar")
     public String updateAvatar(@RequestBody Map<String, String> payload) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
-
         AppUser currentUser = appUserRepository.findByEmail(userEmail);
 
         if (currentUser != null && payload.containsKey("avatar")) {
@@ -48,12 +53,8 @@ public class ProfileController {
 
             currentUser.setAvatar(avatarFileName);
             appUserRepository.save(currentUser);
-            return "Avatar actualizat cu succes!";
+            return "Avatar updated successfully!";
         }
-        return "Eroare: Utilizatorul nu a fost găsit sau datele trimise sunt invalide.";
+        return "Error: User not found or invalid data.";
     }
-
-
-
-
 }

@@ -211,3 +211,26 @@ export const fetchMoviesByGenre = async (genres, page = 1) => {
   });
   return res.data;
 };
+
+export const fetchDashboardData = async () => {
+  try {
+    const response = await axios.get("/api/dashboard");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching dashboard data:", error);
+    throw error;
+  }
+};
+
+export const fetchUserProfile = async () => {
+  const response = await axios.get("/api/profile");
+  console.log("User profile:", response.data);
+  return response.data;
+};
+
+export const updateUserAvatar = async (avatarFileName) => {
+  const response = await axios.post("/api/profile/update-avatar", {
+    avatar: `/images/${avatarFileName}`, // backend se așteaptă să taie partea /images/
+  });
+  return response.data;
+};
