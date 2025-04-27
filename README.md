@@ -1,5 +1,7 @@
 # 📱 MovieMingle-MobileApp
 
+Pentru a citi documentația completă puteți accesa [aici](https://docs.google.com/document/d/1-iNRBI16dD9gP34eL5Rje-JqLYlLbVrRxPyLBHv6IKw/edit?usp=sharing).
+
 ## 🎯 Scopul Proiectului
 **MovieMingle** este o aplicație mobile care recomandă filme utilizatorilor pe baza preferințelor lor. Aplicația îmbunătățește experiența de vizionare prin predicții realizate cu ajutorul tehnicilor de învățare automată. Cu o interfață prietenoasă și un design modern și atrăgător, MovieMingle devine partenerul ideal pentru pasionații de film care caută titluri noi, potrivite gusturilor lor. Indiferent dacă preferi drame, comedii sau thrillere, aplicația va oferi recomandări care se potrivesc așteptărilor tale.
 
@@ -268,6 +270,141 @@ Aici EmailService este simulat pentru a nu trimite un email real, ci doar pentru
 - Mockito este folosit pentru a simula componente externe precum EmailService, SecureTokenService sau AppUserRepository, astfel încât testele să fie rapide, izolate și fiabile.
 ---
 ## Testare React Native (Frontend)
+
+## Framework-uri de testare
+
+În proiectul nostru am utilizat două framework-uri de testare, fiecare adaptat unei nevoi specifice:
+
+| Framework | Scop principal | Tehnologie |
+|-----------|----------------|------------|
+| Jest + React Native Testing Library | Testare unitară și de integrare pentru componente și funcționalitate de bază (frontend) | JavaScript |
+| Maestro | Testare end-to-end a flow-urilor reale de utilizator (frontend) | YAML scripts + Android Emulator |
+
+---
+
+### Testarea aplicației folosind Jest și React Native Testing Library
+
+### Ce este Jest?
+
+**Jest** este un framework de testare dezvoltat de Facebook, extrem de popular în ecosistemul JavaScript, folosit în special pentru aplicații React și React Native. Caracteristici principale:
+
+- Rulează testele foarte rapid, local, fără a fi nevoie de emulator sau device real.
+- Oferă suport pentru snapshot testing (compararea automată a interfeței).
+- Include automat un motor de mock-uri pentru funcții externe (ex: API-uri, module).
+- Integrare excelentă cu biblioteci suplimentare precum React Native Testing Library.
+
+### Ce este React Native Testing Library (RNTL)?
+
+**React Native Testing Library (RNTL)** extinde Jest, oferind utilitare specializate pentru a testa componentele React Native în mod similar cu utilizarea reală. Caracteristici:
+
+- Simulare de acțiuni reale: `fireEvent.press`, `fireEvent.changeText`, etc.
+- Căutare de elemente după text, rol, accesibilitate (`getByText`, `getByTestId`).
+- Focus pe comportamentul aplicației, nu pe implementare.
+- Îmbunătățește claritatea și robustețea testelor.
+
+### De ce am ales Jest + RNTL pentru testare?
+
+- Ideal pentru testarea rapidă a logicii aplicației și a interacțiunilor simple.
+- Permite scrierea ușoară de teste unitare și de integrare.
+- Integrare nativă în React Native cu Expo.
+- Ajută la detectarea timpurie a erorilor fără a rula emulatorul sau device-uri reale.
+- Suport complet pentru mock-uri și simulări de API-uri externe.
+
+### Configurarea Jest și RNTL cu Expo
+
+Aplicația MovieMingle a fost creată folosind **Expo** pentru a simplifica dezvoltarea și testarea:
+
+- Testare realizată cu presetul `jest-expo`.
+- Setup special prin fișierul `jestSetup.js` pentru a defini mock-uri.
+- Izolarea componentelor de dependențele externe.
+- Testare focalizată doar pe logica aplicației noastre, nu pe comportamentul platformei native.
+
+---
+
+## Descrierea testelor Jest + React Native Testing Library (RNTL)
+
+În cadrul proiectului au fost realizate **34 de teste** de mai multe tipuri:
+
+---
+
+### Teste Unitare
+
+| Nr | Test | Ce testează |
+|----|------|-------------|
+| 1 | Buton Login | Testează dacă butonul de login apare corect |
+| 2 | Formular Login | Verifică dacă input-urile de e-mail și parolă funcționează corect |
+| 3 | Validare câmpuri goale | Afișare mesaje de eroare pentru câmpuri goale |
+| 4 | Formular Register | Schimbarea valorilor în input-urile de înregistrare |
+
+---
+
+### Teste Funcționale
+
+| Nr | Test | Ce testează |
+|----|------|-------------|
+| 1 | Afișare Loading Spinner | Verifică afișarea spinner-ului la încărcare filme |
+| 2 | Tratare erori API TMDB | Verifică tratarea erorilor API |
+| 3 | Afișare Mesaje Empty State | Testează afișarea mesajelor pentru liste goale |
+| 4 | Afișare Loading Spinner filme | Verifică afișarea spinner-ului în fetch liste |
+| 5 | Afișare informații utilizator | Afișarea datelor utilizatorului după login |
+| 6 | Afișare grafice dashboard | Verifică randarea corectă a secțiunilor grafice |
+| 7 | Deschidere modal schimbare avatar | Verifică deschiderea modalului de alegere avatar |
+| 8 | Randare câmpuri formular Register | Testează afișarea corectă a câmpurilor de introducere |
+| 9 | Afișare erori inputuri invalide | Afișarea mesajelor de eroare pentru inputuri greșite |
+| 10 | Tratare erori server | Tratarea generală a erorilor serverului |
+| 11 | Randare titlu, subtitlu și search bar | Verifică afișarea elementelor principale pe pagina Search |
+| 12 | Afișare mesaj empty state la căutare | Verifică mesajul "No movies found" |
+
+---
+
+### Teste de Integrare
+
+| Nr | Test | Ce testează |
+|----|------|-------------|
+| 1 | Eroare autentificare (credențiale invalide) | Tratarea erorilor API la login |
+| 2 | Autentificare cu succes | Verifică login-ul și apelul contextului de autentificare |
+| 3 | Navigare la Register Screen | Verifică navigarea către ecranul de înregistrare |
+| 4 | Afișare carusele cu liste de filme | Verifică randarea caruselelor de filme |
+| 5 | Navigare către Movie Details | Navigare corectă la pagina de detalii film |
+| 6 | Căutare filme | Testează căutarea filmelor după input |
+| 7 | Filtrare filme după gen | Verifică filtrarea după gen |
+
+---
+
+### Teste de Performanță
+
+| Nr | Test | Ce testează |
+|----|------|-------------|
+| 1 | Randare inițială HomeScreen | UI HomeScreen randat sub 200ms |
+| 2 | Încărcare conținut HomeScreen | Încărcare secțiuni HomeScreen sub 1000ms |
+| 3 | Încărcare dataset mare | Procesare 500 de filme sub 1500ms |
+
+---
+
+### Test de Snapshot
+
+| Nr | Test | Ce testează |
+|----|------|-------------|
+| 1 | Snapshot Login Screen | Capturează structura vizuală a LoginScreen |
+
+---
+
+### Teste de Accesibilitate
+
+| Nr | Test | Ce testează |
+|----|------|-------------|
+| 1 | Accesibilitate input-uri formulare | Verifică existența labelurilor la Email și Parolă |
+| 2 | Accesibilitate butoane | Verifică butonul de login și link-ul "Forgot Password?" |
+| 3 | Accesibilitate link Register | Verifică link-ul "Have an account?" pentru accesibilitate |
+
+---
+
+- **Toate cele 34 de teste** au fost executate și au trecut cu succes.
+
+---
+
+
+
 ### Maestro
 #### 1. Ce este Maestro?
 **Maestro** este un framework de testare end-to-end destinat aplicațiilor mobile, care folosește un limbaj declarativ bazat pe YAML pentru a scrie teste pentru aplicațiile mobile. A fost creat pentru a oferi o soluție simplă și ușor de utilizat pentru testarea aplicațiilor mobile pe platformele **iOS** și **Android**, și este optimizat pentru aplicațiile care utilizează **Expo** și **Flutter**.
@@ -480,6 +617,26 @@ Comparație Detaliată între Detox și Maestro:
 | Comunitate               | Mare și activă                                  | În creștere, dar mai mică în comparație cu Detox |
 
 ---
+# Studiu comparativ între Jest + RNTL și Maestro
+
+| Caracteristică | Jest + React Native Testing Library (RNTL) | Maestro |
+|----------------|---------------------------------------------|---------|
+| **Tip testare** | Testare unitară și de integrare (Unit/Integration Testing) | Testare end-to-end (E2E) |
+| **Nivel de testare** | Componentă, funcționalitate internă | Flow-uri reale de utilizator |
+| **Limbaj** | JavaScript | YAML (declarativ) |
+| **Necesită emulator/dispozitiv?** | Nu obligatoriu (teste locale rapide) | Da (emulator sau dispozitiv fizic) |
+| **Configurare** | Integrare ușoară cu Expo și Jest | Necesită prebuild aplicație și setup emulator |
+| **Simulare interacțiuni** | Simulează acțiuni asupra componentelor (ex: `fireEvent.press`) | Simulează interacțiuni reale (`tap`, `inputText`) |
+| **Control asupra codului** | Complet (mocks, spies, `jest.fn()`, etc.) | Limitat la interfața vizuală |
+| **Viteză de execuție** | Foarte rapidă (teste locale, fără device) | Mai lentă (teste E2E pe emulator) |
+| **Complexitate cod test** | Necesită cunoștințe de JavaScript | Foarte simplu, declarativ, doar YAML |
+| **Scalabilitate în proiect mare** | Mare (teste fine, unitare și precise) | Bună pentru testarea fluxurilor principale |
+| **Detectare erori** | Detectează rapid bug-uri de implementare logică | Detectează probleme de integrare și UX real |
+| **Utilizare CI/CD** | Integrabil cu Jest în pipelines CI/CD | Integrabil ușor în CI/CD cu scripturi simple |
+| **Cazuri de utilizare ideale** | Testarea logicii interne, componentelor UI/UX | Validarea fluxurilor complete de utilizator |
+
+---
+
 ## 📚 Resurse și Surse de Inspirație
 - Bitrise Blog – [“React Native E2E UI testing with Detox and Bitrise”](https://www.bitrise.io/blog/react-native-e2e-ui-testing-with-detox-and-bitrise)
 - Codecentric – [“Detox vs. Appium – a comparison” (2020)](https://blog.codecentric.de/en/2020/02/detox-vs-appium-comparison)
