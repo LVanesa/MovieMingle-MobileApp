@@ -1,0 +1,12 @@
+appId: com.ncraluca.Frontend
+--- 
+- launchApp
+- tapOn: "Log In"
+- tapOn: "Enter your email"
+- inputText: "ralucanegoita13@gmail.com"
+- tapOn: "Enter your password"
+- inputText: "1213.Ralu"
+- tapOn: "Log in"
+- tapOn: "Log in"
+- assertVisible: "You're now logged in!"
+- tapOn: "OK"

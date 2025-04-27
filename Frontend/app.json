@@ -2,7 +2,7 @@
   "expo": {
     "name": "Frontend",
     "slug": "Frontend",
-    "owner": "laura_vanesa",
+    "owner": "ncraluca",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -24,16 +24,36 @@
             "scheme": "moviemingle",
             "host": "verify"
           },
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        },
+        {
+          "action": "VIEW",
+          "data": {
+            "scheme": "moviemingle",
+            "host": "verify"
+          },
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.ncraluca.Frontend"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a4e372c5-1c66-4223-b333-28745f7bfc4b"
+      }
     }
   }
 }
