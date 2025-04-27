@@ -266,6 +266,218 @@ Aici EmailService este simulat pentru a nu trimite un email real, ci doar pentru
 - JUnit este folosit pentru testarea funcțiilor interne de prelucrare a datelor (ex: criptare parole, validare tokenuri).
 
 - Mockito este folosit pentru a simula componente externe precum EmailService, SecureTokenService sau AppUserRepository, astfel încât testele să fie rapide, izolate și fiabile.
+---
+## Testare React Native (Frontend)
+### Maestro
+#### 1. Ce este Maestro?
+**Maestro** este un framework de testare end-to-end destinat aplicațiilor mobile, care folosește un limbaj declarativ bazat pe YAML pentru a scrie teste pentru aplicațiile mobile. A fost creat pentru a oferi o soluție simplă și ușor de utilizat pentru testarea aplicațiilor mobile pe platformele **iOS** și **Android**, și este optimizat pentru aplicațiile care utilizează **Expo** și **Flutter**.
+Maestro a câștigat rapid popularitate datorită ușurinței sale de utilizare, spre deosebire de alte framework-uri mai complexe, cum ar fi Detox, care necesită cunoștințe în JavaScript și configurări avansate. Maestro a fost creat cu scopul de a reduce complexitatea testării aplicațiilor mobile, astfel încât dezvoltatorii să poată începe rapid și să poată scrie teste de calitate cu un minim de efort.
+
+
+#### 2. Maestro cu Expo
+Expo este o platformă și un set de unelte pentru dezvoltarea aplicațiilor mobile folosind React Native. Maestro poate fi folosit cu aplicațiile Expo pentru a crea teste automate pentru aplicațiile mobile, care rulează pe dispozitive reale sau pe simulatoare/emulatoare.
+
+Cum se folosește Maestro cu Expo?
+- Expo Go este folosit pentru a rula aplicațiile Expo pe un dispozitiv mobil.
+- Maestro poate automatiza interacțiunile cu aplicația mobilă rulată în Expo Go prin intermediul comenzilor de tip YAML.
+  
+Cum se integrează Maestro cu Expo
+
+Pentru a folosi Maestro cu aplicațiile Expo, trebuie să urmezi câțiva pași simpli:
+- **Transformarea aplicației Expo Go într-o aplicație nativă**: Acest lucru se face prin prebuild-ul aplicației (folosind `npx expo prebuild`), ceea ce permite rularea testelor în mediul nativ (folosind `npx expo run:android` sau `npx expo run:ios`).
+- **Configurarea Maestro**: După ce aplicația a fost pre-construită, trebuie să te asiguri că IP-ul pe care rulează serverul Expo (obținut prin comanda `ipconfig` pe PC-ul tău) este corect configurat în fișierul `config.yaml` din proiectul Maestro.
+- **Testarea aplicației**: Odată ce configurațiile sunt corecte, poți rula testele end-to-end folosind comenzile Maestro, care interacționează direct cu aplicația Expo construită.
+
+
+#### 3. Setup-ul pentru a instala Maestro
+Pentru a folosi Maestro pentru testarea aplicațiilor mobile, sunt urmati pașii de mai jos pentru a-l instala și configura corect:
+
+- Instalarea Maestro
+
+Maestro poate fi instalat global folosind **npm** (Node Package Manager). Trebuie instalate **Node.js** și **npm** înainte de a începe.
+De asemenea, ar trebui descarcat zip-ul care contine Maestro, mai multe detalii [aici](https://docs.maestro.dev/getting-started/installing-maestro).
+
+Se execută următoarea comandă în terminal pentru a instala Maestro:
+```bash
+npm install -g maestro
+```
+- Verificarea instalării
+  
+După instalare, se poate verifica dacă Maestro a fost instalat corect folosind următoarea comandă:
+```bash
+maestro --version
+```
+Aceasta ar trebui să returneze versiunea instalată a Maestro.
+
+
+#### 4. Configurarea mediului pentru a rula testele Maestro (pentru Android)
+Dupa configurarea aplicatiei si scrierea testelor, pentru a putea rula testele trebuie urmati urmatorii pasi:
+- se deschide un terminal in care ne aflam in ../Backend (se acceseaza path-ul in care se afla folderul de Backend) si se porneste serverul de Springboot cu comanda `mvn spring-boot:run`
+  - aici e foarte important ca in ../Frontend/api/config.js sa fie pus ip-ul computerului de pe care se ruleaza  (se poate identifica in terminal prin comanda `ipconfig` in sectiunea ***IPv4 Address***)
+  - astfel se face legatura intre Backend si Frontend
+- se deschide un alt terminal in care ne aflam in path-ul ../Frontend se ruleaza comanda `npx expo run:android`
+  - trebuie asteptat raspunsul din terminal cu codul QR pentru a trece la pasul urmator
+- se deschide un alt terminal in care ne aflam in ../Frontend/maestro (path-ul in care se afla testele Maestro) si se ruleaza `maestro test maestro/test-login.yaml` (test-login se poate inlocui cu numele testului care se doreste a fi rulat)
+- foarte important, daca se doreste rularea pe telefonul real, trebuie inainte de toate acestea o configuratie speciala si pentru el
+
+
+#### 5. Setup telefon: Permisiuni de dezvoltator și USB debugging (pentru Android)
+Pentru a conecta un telefon la PC pentru a rula aplicația în test, trebuie activate opțiunile de dezvoltator și USB debugging:
+- Activează opțiunile de dezvoltator:
+  - Mergi la Setări -> Despre telefon -> apasă de 10 ori pe Numărul versiunii pentru a activa opțiunile de dezvoltator.
+- Activează USB debugging:
+  - Mergi în Setări -> Opțiuni pentru dezvoltatori și activează USB debugging.
+- Conectează telefonul la computer prin cablu USB.
+- Acceptă permisiunile de pe telefon pentru a permite conexiunea de dezvoltator.
+
+
+#### 6. Descrierea testelor Maestro
+In cadrul aplicatiei noastre am realizat 4 teste E2E cu Maestro
+
+1. `test-login.yaml`
+   
+In acest fisier este testata interactiunea utilizatorului cu Screen-ul care apare la launch-ul aplicatiei si are loc actiunea de log-in cu credentialele unui cont deja existent pentru a se testa faptul ca logarea se desfasoara precum asteptarilor.
+```yaml
+appId: com.ncraluca.Frontend
+--- 
+- launchApp
+- tapOn: "Log In"
+- tapOn: "Enter your email"
+- inputText: "ralucanegoita13@gmail.com"
+- tapOn: "Enter your password"
+- inputText: "1213.Ralu"
+- tapOn: "Log in"
+- tapOn: "Log in"
+- assertVisible: "You're now logged in!"
+- tapOn: "OK"
+
+```
+2. `test-profile.yaml`
+
+In acest fisier este testata interactiunea utilizatorului dintre un Screen oarecare din aplicatie si Screen-ul de profile astfel:
+- este accesat Screen-ul de profile
+- utilizatorul apasa pe "Change Avatar" pentru a selecta un alt avatar
+- deoarece Maestro functioneaza majoritar pe text si nu interactioneaza bine cu pozele, am ales ca interactiunea sa se finalizeze prin apasarea butonului "Cancel"
+```yaml
+appId: com.ncraluca.Frontend
+---
+- tapOn: "Your Profile"
+- assertVisible: "Your Profile"
+- tapOn: "Change Avatar"
+- assertVisible: "Choose Your Avatar"
+- tapOn: "Cancel"
+```
+3. `test-home.yaml`
+   
+In acest fisier este testata interactiunea utilizatorului dintre un Screen oarecare din aplicatie si Screen-ul de home astfel:
+- se acceseaza screen-ul de Home
+- se apasa pe butonul de "See More" pentru primul film care apare pe ecran
+- se asteapta incarcarea detaliilor filmului
+- se adauga la favorite filmul
+- se adauga la watched filmul
+- se scoate filmul de la favorite
+- se scoate filmul din watched
+```yaml
+appId: com.ncraluca.Frontend
+---
+- tapOn: "Home"
+- assertVisible: "Home"
+- tapOn: "▶ See More"
+- waitForAnimationToEnd
+- assertVisible: "Add to Favorite"
+- tapOn: "Add to Favorite"
+- assertVisible: "Mark as Watched"
+- tapOn: "Mark as Watched"
+- assertVisible: "Added to Favorites"
+- tapOn: "Added to Favorites"
+- assertVisible: "Watched"
+- tapOn: "Watched"
+```
+
+4. `test-search.yaml`
+   
+In acest fisier este testata interactiunea utilizatorului dintre un Screen oarecare din aplicatie si Screen-ul de search astfel:
+- se acceseaza screen-ul de Search
+- se cauta un film dupa keyword-ul "Bullet"
+- se cauta filme dupa genul "Action"
+- se caura filme si dupa genul "Animation"
+- se deselecteaza "Action
+- se deselecteaza "Animation"
+```yaml
+appId: com.ncraluca.Frontend
+---
+- tapOn: "Search"
+- assertVisible: "🎬 Movie Explorer"
+- tapOn: "Search for movies..."
+- inputText: "Bullet"
+- tapOn: "Action"
+- tapOn: "Action"
+- assertVisible: "Action"
+- tapOn: "Animation"
+- assertVisible: "Animation"
+- tapOn: "Action"
+- tapOn: "Animation"
+```
+
+
+#### 7. De unde se ia appId pentru teste
+AppId-ul se poate găsi în fișierul app.json din proiectul Expo. Acesta este un identificator unic al aplicației.
+```json
+{
+  "expo": {
+    "name": "Frontend",
+    "slug": "Frontend",
+    "android": {
+      "package": "com.ncraluca.Frontend"
+    }
+  }
+}
+```
+AppId-ul în acest caz este ***com.ncraluca.Frontend***.
+
+
+#### 8. Comparatie între Maestro și Detox
+Testarea aplicațiilor mobile a devenit o componentă crucială în dezvoltarea de software, iar pentru dezvoltatorii de aplicații React Native, Detox și Maestro sunt două dintre cele mai populare framework-uri de testare end-to-end. Ambele oferă soluții eficiente pentru testarea aplicațiilor pe dispozitive fizice și simulatoare, dar fiecare are caracteristicile și avantajele sale. În această comparație detaliată, vom explora fiecare framework în parte, subliniind punctele forte ale fiecăruia, diferențele între ele și la ce tipuri de proiecte se potrivesc cel mai bine.
+
+Ce este Detox?
+
+Detox este un framework de testare end-to-end pentru aplicațiile React Native. Acesta a fost dezvoltat de Wix și este unul dintre cele mai populare framework-uri de testare pentru React Native, fiind adesea utilizat pentru a testa aplicații în mod real, pe dispozitive sau simulatoare iOS și Android. Detox folosește JavaScript pentru a scrie teste și oferă un set de API-uri care permit dezvoltatorilor să controleze aplicațiile, să simuleze interacțiuni și să verifice comportamentele aplicațiilor. Detox se integrează bine cu Jest, oferind o soluție robustă pentru testarea automată a aplicațiilor.
+
+Avantaje Detox
+- Suport complet pentru React Native: Detox este construit special pentru aplicațiile React Native, oferind un control detaliat asupra comportamentului aplicațiilor, cu acces la API-urile native.
+- Testare pe dispozitive reale: Detox permite testarea pe dispozitive reale, ceea ce este esențial pentru verificarea comportamentului aplicației în condiții reale.
+- Flexibilitate și control: Detox oferă un control detaliat asupra aplicațiilor, incluzând suport pentru gesturi, sincronizare cu aplicațiile și verificarea unor stări foarte specifice ale aplicației.
+- Comunitate activă: Detox are o comunitate mare și activă, iar documentația este foarte bine structurată, ceea ce face mai ușor să înveți și să folosești framework-ul.
+
+Dezavantaje Detox:
+- Configurare complexă: Configurarea Detox pe Android și iOS poate fi o provocare, mai ales pentru dezvoltatorii care nu sunt familiarizați cu configurările avansate ale mediului de dezvoltare.
+- Limbaj JavaScript: Detox folosește JavaScript, ceea ce poate să nu fie ideal pentru toți dezvoltatorii. De asemenea, pentru dezvoltatorii care preferă limbaje mai declarative, această abordare poate părea un pic mai complicată.
+
+Ce este Maestro?
+
+Maestro este un framework de testare mai recent, care promite o abordare mai simplă și mai ușor de învățat pentru testarea aplicațiilor mobile. Spre deosebire de Detox, care folosește JavaScript, Maestro folosește YAML pentru a scrie teste, ceea ce îl face foarte accesibil pentru cei care nu sunt familiarizați cu programarea. Maestro poate fi folosit atât pentru aplicațiile React Native, cât și pentru aplicațiile Flutter, oferind o soluție unificată pentru ambele platforme. Acesta este optimizat pentru testarea aplicațiilor care folosesc Expo, un alt motiv pentru care devine tot mai popular printre dezvoltatorii React Native care folosesc Expo în procesul lor de dezvoltare.
+
+Avantaje Maestro:
+- Configurare simplă și rapidă: Maestro are o configurare mult mai simplă decât Detox. Testele sunt scrise în YAML, iar configurarea este minimă, făcându-l o alegere excelentă pentru echipele care doresc să înceapă rapid cu testele end-to-end.
+- Suport pentru Expo și Flutter: Maestro este ideal pentru aplicațiile care folosesc Expo sau Flutter. Dacă dezvoltatorul folosește Expo Go pentru a construi aplicațiile sale, Maestro poate fi integrat rapid pentru a efectua testele end-to-end, fără necesitatea unei configurații avansate.
+- Ușor de învățat: Deoarece folosirea YAML este mult mai simplă și mai declarativă decât programarea în JavaScript, dezvoltatorii care nu sunt familiarizați cu limbaje de programare complexe pot învăța rapid cum să scrie teste cu Maestro.
+- Suport cross-platform: Maestro poate fi folosit pe Android și iOS, făcându-l o alegere bună pentru aplicațiile care trebuie să ruleze pe ambele platforme.
+
+Dezavantaje Maestro:
+- Mai puțin flexibil: În comparație cu Detox, Maestro oferă mai puține opțiuni de personalizare și mai puțin control asupra detaliilor aplicației. De exemplu, dezvoltatorii nu pot simula la fel de multe interacțiuni avansate sau comportamente native ale aplicației.
+- Nou pe piață: Deși este în creștere, Maestro nu are încă o comunitate la fel de mare ca Detox, iar documentația nu este la fel de detaliată în comparație cu Detox.
+  
+Comparație Detaliată între Detox și Maestro:
+| Caracteristică          | Detox                                          | Maestro                                      |
+|-------------------------|------------------------------------------------|----------------------------------------------|
+| Limbaj de programare     | JavaScript (Jest)                              | YAML (declarativ)                            |
+| Configurare              | Complexă (mai multe setări, nevoie de configurare manuală pentru Android/iOS) | Simplă, mai rapidă, optimizată pentru Expo  |
+| Suport Expo              | Limitat                                        | Complet (ideal pentru aplicațiile Expo)      |
+| Suport Flutter           | Nu                                             | Da (suport cross-platform)                   |
+| Flexibilitate            | Mare, cu control detaliat asupra aplicației    | Limitată comparativ cu Detox                 |
+| Ușurință de învățare     | Medie (necesită cunoștințe de JavaScript și configurări avansate) | Ridicată (folosirea YAML este ușor de învățat)|
+| Suport CI/CD             | Da (integrare completă în CI)                  | Da (se integrează ușor în pipeline-urile CI) |
+| Comunitate               | Mare și activă                                  | În creștere, dar mai mică în comparație cu Detox |
 
 ---
 ## 📚 Resurse și Surse de Inspirație
@@ -276,4 +488,7 @@ Aici EmailService este simulat pentru a nu trimite un email real, ci doar pentru
 - [Jest Testing Framework](https://jestjs.io/)
 - [React Native Testing Library Docs](https://testing-library.com/docs/react-native-testing-library/intro/)
 - [JUnit 5 Official Documentation](https://junit.org/junit5/)
-
+- [Documentația Oficială Detox](https://wix.github.io/Detox/)
+- [Documentația Oficială Maestro:](https://docs.maestro.dev/)
+- [Detox vs Maestro Comparison on Medium](https://medium.com/@joemcguinness/choosing-a-new-framework-for-mobile-ui-testing-for-react-native-08f1cd3a4042)
+- [End-to-end Testing Mobile Apps with Maestro](https://hybridheroes.de/blog/end-to-end-testing-maestro/)
