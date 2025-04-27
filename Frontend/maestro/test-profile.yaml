@@ -1,0 +1,7 @@
+appId: com.ncraluca.Frontend
+---
+- tapOn: "Your Profile"
+- assertVisible: "Your Profile"
+- tapOn: "Change Avatar"
+- assertVisible: "Choose Your Avatar"
+- tapOn: "Cancel"

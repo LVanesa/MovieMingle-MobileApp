@@ -1,0 +1,14 @@
+appId: com.ncraluca.Frontend
+---
+- tapOn: "Home"
+- assertVisible: "Home"
+- tapOn: "▶ See More"
+- waitForAnimationToEnd
+- assertVisible: "Add to Favorite"
+- tapOn: "Add to Favorite"
+- assertVisible: "Mark as Watched"
+- tapOn: "Mark as Watched"
+- assertVisible: "Added to Favorites"
+- tapOn: "Added to Favorites"
+- assertVisible: "Watched"
+- tapOn: "Watched"

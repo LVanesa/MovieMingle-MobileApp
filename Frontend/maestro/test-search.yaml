@@ -1,0 +1,13 @@
+appId: com.ncraluca.Frontend
+---
+- tapOn: "Search"
+- assertVisible: "🎬 Movie Explorer"
+- tapOn: "Search for movies..."
+- inputText: "Bullet"
+- tapOn: "Action"
+- tapOn: "Action"
+- assertVisible: "Action"
+- tapOn: "Animation"
+- assertVisible: "Animation"
+- tapOn: "Action"
+- tapOn: "Animation"
