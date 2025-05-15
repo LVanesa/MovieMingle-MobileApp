@@ -20,7 +20,7 @@ Pentru a eficientiza procesul de dezvoltare și a reutiliza o bază solidă de c
 
 ## 📸 Screenshots din aplicație:
 
-<img src="screenshots/2.jpg" width="150" />        <img src="screenshots/1.jpg" width="150" />   <img src="screenshots/3.jpg" width="150" />   <img src="screenshots/4.jpg" width="150" />
+<img src="screenshots/2.jpg" width="200" />        <img src="screenshots/1.jpg" width="200" />   <img src="screenshots/3.jpg" width="200" />   <img src="screenshots/4.jpg" width="200" />
 
 ## 🧱 Arhitectura aplicației și tehnologiile folosite
 - **Frontend (Mobile)**: aplicație **React Native** care oferă o interfață intuitivă pentru utilizatori.
