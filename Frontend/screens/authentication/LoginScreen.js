@@ -14,7 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import { loginUser } from "../../api/authApi";
 import { AuthContext } from "../../store/auth-context";
 import InputField from "../../components/InputField";
-import { useGoogleAuth } from "./GoogleAuth";
+//import { useGoogleAuth } from "./GoogleAuth";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -23,7 +23,7 @@ const LoginScreen = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
 
-  const { promptAsync } = useGoogleAuth();
+  //const { promptAsync } = useGoogleAuth();
 
   const handleChange = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -32,12 +32,14 @@ const LoginScreen = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!form.email) newErrors.email = "Email is required";
-    if (!form.password) newErrors.password = "Password is required";
+    if (!form.email.trim()) newErrors.email = "Email is required";
+    if (!form.password.trim()) newErrors.password = "Password is required";
     return newErrors;
   };
 
   const handleLogin = async () => {
+    setErrors({}); // Clear all errors before validation
+
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -53,7 +55,7 @@ const LoginScreen = () => {
       const errorMsg =
         error?.response?.data?.error ||
         "Login failed. Please check your credentials.";
-      setErrors((prev) => ({ ...prev, general: errorMsg }));
+      setErrors({ general: errorMsg }); // Clear field errors, only show general error
     }
   };
 
@@ -71,10 +73,14 @@ const LoginScreen = () => {
             <Text style={styles.title}>Login</Text>
 
             {errors.general && (
-              <Text style={styles.generalError}>{errors.general}</Text>
+              <Text testID="errorMessage" style={styles.generalError}>
+                {errors.general}
+              </Text>
             )}
 
             <InputField
+              testID="emailInput"
+              accessibilityLabel="Email input"
               label="Email"
               value={form.email}
               onChange={(text) => handleChange("email", text)}
@@ -84,6 +90,8 @@ const LoginScreen = () => {
             />
 
             <InputField
+              testID="passwordInput"
+              accessibilityLabel="Password input"
               label="Password"
               value={form.password}
               onChange={(text) => handleChange("password", text)}
@@ -96,11 +104,16 @@ const LoginScreen = () => {
               <Text style={styles.linkUnderline}>Forgot Password?</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleLogin}
+              testID="loginButton"
+              accessibilityLabel="Login button"
+            >
               <Text style={styles.buttonText}>Log in</Text>
             </TouchableOpacity>
 
-            <View style={styles.separator}>
+            {/* <View style={styles.separator}>
               <View style={styles.line} />
               <Text style={styles.separatorText}>OR</Text>
               <View style={styles.line} />
@@ -112,6 +125,7 @@ const LoginScreen = () => {
             >
               <Text style={styles.googleText}>Login with Google</Text>
             </TouchableOpacity>
+ */}
 
             <TouchableOpacity
               onPress={() => navigation.navigate("Register")}

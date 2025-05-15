@@ -32,7 +32,7 @@ const MovieActions = ({ userId, tmdbId, title }) => {
     ));
 
   return (
-    <View style={styles.container}>
+    <View testID="movie-actions" style={styles.container}>
       <View style={styles.buttonRow}>
         <TouchableOpacity style={styles.button} onPress={toggleFav}>
           <FontAwesome name="heart" size={16} color="#fff" />

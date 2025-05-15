@@ -128,6 +128,7 @@ const SearchScreen = () => {
 
       {loading && page === 1 ? (
         <ActivityIndicator
+          testID="loading-indicator"
           size="large"
           color="#fff"
           style={{ marginTop: 50 }}

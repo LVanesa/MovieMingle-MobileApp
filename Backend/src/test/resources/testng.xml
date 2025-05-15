@@ -1,0 +1,11 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="Default Suite">
+    <test name="MovieMingle TestNG Suite">
+        <classes>
+            <class name="com._errors.MovieMingle.service.user.DefaultAppUserServiceTestNG"/>
+            <class name="com._errors.MovieMingle.integration.IntegrationTestsTestNG"/>
+            <class name="com._errors.MovieMingle.functional.RatingServiceParameterizedTestNG"/>
+            <class name="com._errors.MovieMingle.functional.MoviesTestNG"/>
+        </classes>
+    </test>
+</suite>
