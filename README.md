@@ -1,8 +1,8 @@
 # Echipa B4 – Testarea unei aplicații mobile 📱
 
 ## Linkuri proiect
-- 📌 **Documentație completă (PDF):**  [aici](https://docs.google.com/document/d/1-iNRBI16dD9gP34eL5Rje-JqLYlLbVrRxPyLBHv6IKw/edit?usp=sharing).
-- 📊 **Prezentare PPT (rezumat):**  
+- 📌 **Documentație completă (PDF):**  [aici](Documentatie_TSS_Testarea_unei_aplicații_mobile.pdf).
+- 📊 **Prezentare PPT (PDF):** [aici](Prezentare_TSS_Testarea_unei_aplicatii_mobile.pdf)  
 - 📹 **Demo aplicație:** [aici](https://youtu.be/RyaEcpjbC_Q).
 - 📹 **Demo testare Maestro:** [aici](https://youtube.com/shorts/_i81mKKKZoQ).
 - :clipboard: **Raport despre folosirea unui tool AI:** [aici](raportAI.md)
@@ -18,6 +18,9 @@ Pentru a eficientiza procesul de dezvoltare și a reutiliza o bază solidă de c
   
 **MovieMingle** este o aplicație mobile care recomandă filme utilizatorilor pe baza preferințelor lor. Aplicația îmbunătățește experiența de vizionare prin predicții realizate cu ajutorul tehnicilor de învățare automată. Cu o interfață prietenoasă și un design modern și atrăgător, MovieMingle devine partenerul ideal pentru pasionații de film care caută titluri noi, potrivite gusturilor lor. Indiferent dacă preferi drame, comedii sau thrillere, aplicația va oferi recomandări care se potrivesc așteptărilor tale.
 
+## 📸 Screenshots din aplicație:
+
+<img src="screenshots/2.jpg" width="240" />        <img src="screenshots/1.jpg" width="240" />   <img src="screenshots/3.jpg" width="240" />   <img src="screenshots/4.jpg" width="240" />
 
 ## 🧱 Arhitectura aplicației și tehnologiile folosite
 - **Frontend (Mobile)**: aplicație **React Native** care oferă o interfață intuitivă pentru utilizatori.
