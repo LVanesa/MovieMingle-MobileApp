@@ -4,7 +4,7 @@
 - 📌 **Documentație completă (PDF):**  [aici](https://docs.google.com/document/d/1-iNRBI16dD9gP34eL5Rje-JqLYlLbVrRxPyLBHv6IKw/edit?usp=sharing).
 - 📊 **Prezentare PPT (rezumat):**  
 - 📹 **Demo aplicație:** [aici](https://youtu.be/RyaEcpjbC_Q).
-- 📹 **Demo testare mockito:** [aici](https://youtube.com/shorts/_i81mKKKZoQ).
+- 📹 **Demo testare Maestro:** [aici](https://youtube.com/shorts/_i81mKKKZoQ).
 - :clipboard: **Raport despre folosirea unui tool AI:** [aici](raportAI.md)
 
 ---
