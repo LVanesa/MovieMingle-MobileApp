@@ -107,7 +107,11 @@ const ProfileScreen = () => {
   if (pageLoading) {
     return (
       <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#5c0000" />
+        <ActivityIndicator
+          testID="loading-indicator"
+          size="large"
+          color="#5c0000"
+        />
       </View>
     );
   }

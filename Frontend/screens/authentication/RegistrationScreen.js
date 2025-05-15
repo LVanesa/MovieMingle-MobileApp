@@ -96,7 +96,11 @@ const RegistrationScreen = () => {
               </View>
             ))}
 
-            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+            <TouchableOpacity
+              testID="submit-button"
+              style={styles.button}
+              onPress={handleSubmit}
+            >
               <Text style={styles.buttonText}>Sign Up</Text>
             </TouchableOpacity>
 

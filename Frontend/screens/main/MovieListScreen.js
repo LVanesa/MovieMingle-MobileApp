@@ -59,7 +59,11 @@ const MovieListScreen = () => {
   if (loading) {
     return (
       <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#5c0000" />
+        <ActivityIndicator
+          testID="loading-spinner"
+          size="large"
+          color="#5c0000"
+        />
       </View>
     );
   }

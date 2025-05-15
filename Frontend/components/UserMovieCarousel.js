@@ -24,7 +24,10 @@ const UserMovieCarousel = ({ title, movies, onPressMovie }) => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingLeft: 16 }}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => onPressMovie(item)}>
+          <TouchableOpacity
+            testID={`movie-item-${item.tmdbId}`}
+            onPress={() => onPressMovie(item)}
+          >
             <View style={styles.card}>
               <Image
                 source={{

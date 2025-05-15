@@ -9,6 +9,8 @@ const InputField = ({
   error,
   secureTextEntry = false,
   keyboardType = "default",
+  testID,
+  accessibilityLabel,
 }) => {
   return (
     <View style={styles.wrapper}>
@@ -21,6 +23,8 @@ const InputField = ({
         secureTextEntry={secureTextEntry}
         autoCapitalize="none"
         keyboardType={keyboardType}
+        testID={testID}
+        accessibilityLabel={accessibilityLabel}
       />
       {error && <Text style={styles.error}>{error}</Text>}
     </View>
