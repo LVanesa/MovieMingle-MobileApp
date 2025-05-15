@@ -20,6 +20,7 @@
     "expo": "~52.0.43",
     "expo-auth-session": "~6.0.3",
     "expo-status-bar": "~2.0.1",
+    "expo-system-ui": "^4.0.9",
     "expo-web-browser": "~14.0.2",
     "install": "^0.13.0",
     "jwt-decode": "^4.0.0",
